@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-
+import { Notification } from "element-ui";
 Vue.use(Router);
 
 /* Layout */
@@ -32,6 +32,11 @@ import Layout from "@/layout";
  */
 export const constantRoutes = [
   {
+    path: "/",
+    redirect: "/login",
+    hidden: true
+  },
+  {
     path: "/login",
     component: () => import("@/views/login/index"),
     hidden: true
@@ -44,9 +49,8 @@ export const constantRoutes = [
   },
 
   {
-    path: "/",
+    path: "/systemInfo",
     component: Layout,
-    redirect: "/systemInfo",
     children: [
       {
         path: "systemInfo",
@@ -60,7 +64,6 @@ export const constantRoutes = [
   {
     path: "/expenses",
     component: Layout,
-    redirect: "/expenses",
     children: [
       {
         path: "expenses",
@@ -74,7 +77,6 @@ export const constantRoutes = [
   {
     path: "/remeber",
     component: Layout,
-    redirect: "/remeber",
     children: [
       {
         path: "remeber",
@@ -109,6 +111,25 @@ const createRouter = () =>
   });
 
 const router = createRouter();
+
+router.beforeEach((to, from, next) => {
+  if (!(to.fullPath === "/login")) {
+    let token = sessionStorage.getItem("token");
+    if (token) {
+      next();
+    } else {
+      Notification({
+        type: "error",
+        title: "失败",
+        message: "请登陆",
+        duration: 1500
+      });
+      next("/login");
+    }
+  } else {
+    next();
+  }
+});
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {

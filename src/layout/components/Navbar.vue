@@ -17,16 +17,16 @@
           />-->
 
           <div class="name">
-            林俊杰，你好
+           {{userInfo.realname?userInfo.realname:userInfo.username}}，你好
             <i class="el-icon-caret-bottom" />
           </div>
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
-            <el-dropdown-item>Home</el-dropdown-item>
+          <router-link to="/systemInfo">
+            <el-dropdown-item>首页</el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">Log Out</span>
+            <span style="display:block;" @click="logout">注销</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -38,8 +38,14 @@
 import { mapGetters } from "vuex";
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
-
+import http from "@/utils/request";
+    
 export default {
+    data(){
+        return{
+            userInfo:{}
+        }
+    },
   components: {
     Breadcrumb,
     Hamburger
@@ -47,11 +53,38 @@ export default {
   computed: {
     ...mapGetters(["sidebar", "avatar"])
   },
+  created() {
+      this.$eventBus.$on('getUserInfo',()=>{
+           this.getUserInfo()
+      });
+      this.getUserInfo()
+  },
+  beforeDestroy(){
+       this.$eventBus.$off('getUserInfo');
+  },
   methods: {
+      getUserInfo() {
+      http({
+        url: "users/userInfo",
+        method: "get"
+      }).then(res => {
+        this.userInfo = res.data.data;
+      });
+    },
+
     toggleSideBar() {
       this.$store.dispatch("app/toggleSideBar");
     },
-    logout() {}
+    logout() {
+      sessionStorage.clear();
+      this.$notify({
+        type: "success",
+        title: "成功",
+        message: "注销成功",
+        duration: 1500
+      });
+      this.$router.push({ path: "/" });
+    }
   }
 };
 </script>

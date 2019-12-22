@@ -15,6 +15,7 @@ import router from "./router";
 import "@/icons"; // icon
 import "@/permission"; // permission control
 
+import waves from "@/utils/waves/index";
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -26,8 +27,11 @@ import "@/permission"; // permission control
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale });
+// 自定义指令
+Vue.directive("waves", waves);
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
+Vue.prototype.$eventBus = new Vue()
 
 Vue.config.productionTip = false;
 

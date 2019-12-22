@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-form
-      ref="loginForm"
+      ref="form"
       :model="loginForm"
       :rules="loginRules"
       class="login-form"
@@ -9,7 +9,7 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">个人信息事务管理系统</h3>
       </div>
 
       <el-form-item prop="username">
@@ -19,7 +19,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="用户名"
           name="username"
           type="text"
           tabindex="1"
@@ -36,63 +36,61 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="密码"
           name="password"
           tabindex="2"
           auto-complete="on"
-          @keyup.enter.native="handleLogin"
+          @keyup.enter.native="login"
         />
         <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
 
-      <el-button
-        :loading="loading"
-        type="primary"
-        style="width:100%;margin-bottom:30px;"
-        @click.native.prevent="handleLogin"
-      >Login</el-button>
-
-      <div class="tips">
+      <div class="login-wrapper">
+        <el-button v-waves :loading="loading" type="primary" @click.native.prevent="login">登陆</el-button>
+        <el-button v-waves :loading="loading" type="primary" @click.native.prevent="register">注册</el-button>
+      </div>
+      <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span>password: any</span>
-      </div>
+      </div>-->
     </el-form>
   </div>
 </template>
 
 <script>
 import { validUsername } from "@/utils/validate";
+import http from "@/utils/request";
 
 export default {
   name: "Login",
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error("Please enter the correct user name"));
-      } else {
-        callback();
-      }
-    };
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error("The password can not be less than 6 digits"));
-      } else {
-        callback();
-      }
-    };
+    // const validateUsername = (rule, value, callback) => {
+    //   if (!validUsername(value)) {
+    //     callback(new Error("Please enter the correct user name"));
+    //   } else {
+    //     callback();
+    //   }
+    // };
+    // const validatePassword = (rule, value, callback) => {
+    //   if (value.length < 6) {
+    //     callback(new Error("The password can not be less than 6 digits"));
+    //   } else {
+    //     callback();
+    //   }
+    // };
     return {
       loginForm: {
-        username: "admin",
-        password: "111111"
+        username: "",
+        password: ""
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", validator: validateUsername }
+          { required: true, message: "请输入用户名", trigger: "blur" }
         ],
         password: [
-          { required: true, trigger: "blur", validator: validatePassword }
+          { required: true, message: "请输入用户密码", trigger: "blur" }
         ]
       },
       loading: false,
@@ -108,6 +106,12 @@ export default {
       immediate: true
     }
   },
+  created() {
+    // const token = localStorage.getItem("token");
+    // if (token) {
+    //   this.$router.push({ path: "/" });
+    // }
+  },
   methods: {
     showPwd() {
       if (this.passwordType === "password") {
@@ -119,14 +123,78 @@ export default {
         this.$refs.password.focus();
       });
     },
-    handleLogin() {
-      this.$router.push({ path: "/" });
+    login() {
+      this.$refs.form.validate(validate => {
+        if (validate) {
+          http({
+            method: "post",
+            url: "users/login",
+            data: this.loginForm
+          }).then(res => {
+            if (res.data.success) {
+              const token = res.data.data.token;
+              sessionStorage.setItem("token", token);
+              this.$notify({
+                title: "成功",
+                type: "success",
+                message: "登陆成功",
+                duration: 1500
+              });
+              this.$router.push({ path: "/systemInfo/systemInfo" });
+            } else {
+              this.$notify({
+                title: "失败",
+                type: "error",
+                message: res.data.msg,
+                duration: 1500
+              });
+            }
+          });
+          //   this.$router.push({ path: "/" });
+        }
+      });
+    },
+    register() {
+      this.$refs.form.validate(validate => {
+        if (validate) {
+          http({
+            method: "post",
+            url: "users/register",
+            data: this.loginForm
+          }).then(res => {
+            if (res.data.success) {
+              this.$notify({
+                title: "成功",
+                type: "success",
+                message: "注册成功，请登录",
+                duration: 1500
+              });
+            } else {
+              this.$notify({
+                title: "失败",
+                type: "error",
+                message: res.data.msg,
+                duration: 1500
+              });
+            }
+          });
+          //   this.$router.push({ path: "/" });
+        }
+      });
     }
   }
 };
 </script>
 
 <style lang="scss">
+.login-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  .el-button {
+    flex: 1;
+  }
+}
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
