@@ -1,9 +1,11 @@
 <template>
   <el-dialog
+    v-loading="loading"
     title="修改密码"
     :visible.sync="dialogVisible"
     width="400px"
-    @close="dialogClose"
+    @closed="dialogClose"
+    :close-on-click-modal="false"
   >
     <el-form ref="form" :model="form" :rules="rule" label-width="80px">
       <el-form-item label="旧密码：" prop="oldPassword">
@@ -25,6 +27,7 @@ import http from "@/utils/request";
 export default {
   data() {
     return {
+      loading:false,
       dialogVisible: false,
       form: { oldPassword: "", newPassword: "" },
       rule: {
@@ -46,34 +49,35 @@ export default {
       this.form = { oldPassword: "", newPassword: "" };
     },
     submit() {
-      this.$refs.form.validate(
-        validate => {
-          if(validate) {
-            http({
-              url: "users/resetPassword",
-              method: "post",
-              data: this.form
-            }).then(res => {
-              if (res.data.success) {
-                this.$notify({
-                  title: "成功",
-                  type: "success",
-                  message: res.data.msg,
-                  duration: 1500
-                });
-                this.dialogVisible = false;
-              } else {
-                this.$notify({
-                  title: "失败",
-                  type: "error",
-                  message: res.data.msg,
-                  duration: 1500
-                });
-              }
-            });
-          }
+      this.$refs.form.validate(validate => {
+        if (validate) {
+          this.loading = true;
+          http({
+            url: "users/resetPassword",
+            method: "post",
+            data: this.form
+          }).then(res => {
+            if (res.data.success) {
+              this.$notify({
+                title: "成功",
+                type: "success",
+                message: res.data.msg,
+                duration: 1500
+              });
+              this.dialogVisible = false;
+            } else {
+              this.$notify({
+                title: "失败",
+                type: "error",
+                message: res.data.msg,
+                duration: 1500
+              });
+            }
+          }).finally(()=>{
+            this.loading=false;
+          });
         }
-      );
+      });
     }
   }
 };
