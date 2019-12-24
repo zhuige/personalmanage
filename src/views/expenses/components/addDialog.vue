@@ -12,7 +12,7 @@
       </el-form-item>
       <el-form-item label="时间：" prop="date">
         <el-date-picker
-          value-format="timestamp"
+          value-format="yyyy-MM-dd"
           v-model="form.date"
           type="date"
           placeholder="选择日期"
@@ -51,6 +51,9 @@ export default {
   data() {
     const validate = (rule, value, callback) => {
       var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+      if(value.length > 8){
+          callback(new Error("请按现实来填写"));
+      }
       if (!reg.test(value)) {
         callback(new Error("请输入正确的金额"));
       } else {
@@ -78,10 +81,10 @@ export default {
   },
   methods: {
     init(type, item) {
-      let obj = JSON.parse(JSON.stringify(item));
-      this.type === type;
+      this.type = type;
       if (type === "edit") {
-        this.form = item;
+        let obj = JSON.parse(JSON.stringify(item));
+        this.form = obj;
       }
       this.dialogVisible = true;
     },
@@ -108,7 +111,7 @@ export default {
       });
     },
     onUpadte(){
-    http({ url: "expenses/edit", data: this.form, method: "post" })
+    http({ url: "expenses/update", data: this.form, method: "post" })
             .then(res => {
               this.$notify({
                 title: "成功",

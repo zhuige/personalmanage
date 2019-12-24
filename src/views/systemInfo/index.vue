@@ -15,7 +15,7 @@
           <el-input v-model="form.hobbies" @blur="updateUserInfo"></el-input>
         </el-form-item>
         <el-form-item label="密码：">
-          <el-button v-waves type="primary" size="medium" @click="resetPassword">重置密码</el-button>
+          <el-button v-waves type="primary" size="medium" @click="resetPassword">修改密码</el-button>
         </el-form-item>
       </el-form>
     </div>

@@ -34,6 +34,6 @@ export default {
 </script>
 <style>
 .container {
-  padding:40px;
+  padding:20px 40px;
 }
 </style>
