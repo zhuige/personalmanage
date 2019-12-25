@@ -90,8 +90,11 @@ export default {
         type: "warning"
       }).then(() => {
         http({
-          url: "expenses/delete?id=" + id,
-          method: "delete"
+          url: "expenses/delete",
+          method: "delete",
+          data:{
+            id
+          }
         }).then(res => {
             this.getList();
           this.$notify({
@@ -101,7 +104,9 @@ export default {
             duration: 1500
           });
         });
-      });
+      }).catch(()=>{
+       
+      })
     }
   }
 };

@@ -3,7 +3,7 @@
     <el-button v-waves type="primary" size="medium" icon="el-icon-plus" @click="onAdd">新增备忘录</el-button>
     <div class="table-wrapper">
     <el-table :data="list" v-loading="loading">
-      <el-table-column label="标题"> 
+      <el-table-column label="标题">
         <template slot-scope="scope">
           {{scope.row.title}}
         </template>
@@ -13,14 +13,17 @@
           {{scope.row.date}}
         </template>
       </el-table-column>
-      <el-table-column label="类型"> 
+      <el-table-column label="优先级"> 
         <template slot-scope="scope">
-          {{scope.row.state}}
-        </template>
-      </el-table-column>
-      <el-table-column label="金额"> 
-        <template slot-scope="scope">
-          ¥ {{scope.row.money}}
+          <template v-if="scope.row.state ==='重要'">
+          <el-tag type="danger">{{scope.row.state}}（高）</el-tag>
+          </template>
+           <template v-if="scope.row.state ==='一般'">
+          <el-tag type="warning">{{scope.row.state}}（中）</el-tag>
+          </template>
+           <template v-if="scope.row.state ==='次要'">
+          <el-tag type="info">{{scope.row.state}}（低）</el-tag>
+          </template>
         </template>
       </el-table-column>
       <!-- show-overflow-tooltip  -->
@@ -29,10 +32,10 @@
           {{scope.row.remark}}
         </template>
       </el-table-column>
-      <el-table-column label="操作"> 
+      <el-table-column label="操作" width="180px"> 
         <template slot-scope="scope">
-           <el-button size="mini" type="info" @click="onEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger">删除</el-button>
+           <el-button v-waves size="mini" type="info" @click="onEdit(scope.row)">编辑</el-button>
+          <el-button v-waves size="mini" type="danger" @click="onDelete(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,6 +68,10 @@ export default {
         url: "remeber/list"
       }).then(res => {
         this.list = res.data.data;
+        let arr = ['重要','一般','次要'];
+        this.list.map(item=>{
+          item.state = arr[item.state-1];
+        })
       }).finally(()=>{
         this.loading= false;
       });
@@ -74,6 +81,31 @@ export default {
     },
     onEdit(item) {
        this.$refs.addDialog.init('edit',item);
+    },
+    onDelete(id) {
+      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        http({
+          url: "remeber/delete",
+          method: "delete",
+          data:{
+            id
+          }
+        }).then(res => {
+            this.getList();
+          this.$notify({
+            title: "成功",
+            message: "删除成功",
+            type: "success",
+            duration: 1500
+          });
+        });
+      }).catch(()=>{
+       
+      });
     }
   }
 };

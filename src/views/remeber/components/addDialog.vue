@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="type === 'add' ? '记一笔' : '编辑'"
+    :title="type === 'add' ? '新增备忘录' : '编辑备忘录'"
     :visible.sync="dialogVisible"
     width="500px"
     :close-on-click-modal="false"
@@ -12,22 +12,18 @@
       </el-form-item>
       <el-form-item label="时间：" prop="date">
         <el-date-picker
-          value-format="timestamp"
+          value-format="yyyy-MM-dd HH:mm:ss"
           v-model="form.date"
-          type="date"
-          placeholder="选择日期"
+          type="datetime"
+          placeholder="选择日期时间"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item label="类型：" prop="state">
+      <el-form-item label="优先级：" prop="state">
         <el-select v-model="form.state" placeholder="请选择">
-          <el-option label="收入" value="1"> </el-option>
-          <el-option label="支出" value="2"> </el-option>
+          <el-option label="重要（高）" value="1"> </el-option>
+          <el-option label="一般（中）" value="2"> </el-option>
+          <el-option label="次要（低）" value="3"> </el-option>
         </el-select>
-      </el-form-item>
-      <el-form-item label="金额：" prop="money">
-        <el-input v-model="form.money">
-          <template slot="append">元(仅支持两位小数)</template>
-        </el-input>
       </el-form-item>
       <el-form-item label="备注：" prop="remark">
         <el-input type="textarea" v-model="form.remark"> </el-input>
@@ -49,14 +45,6 @@ import http from "@/utils/request";
 
 export default {
   data() {
-    const validate = (rule, value, callback) => {
-      var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
-      if (!reg.test(value)) {
-        callback(new Error("请输入正确的金额"));
-      } else {
-        callback();
-      }
-    };
     return {
       type: "add",
       loading: false,
@@ -65,23 +53,31 @@ export default {
         title: "",
         state: "1",
         date: "",
-        remark: "",
-        money: ""
+        remark: ""
       },
       rule: {
         title: [{ required: true, message: "请输入标题", trigger: "blur" }],
         date: [{ required: true, message: "请输入日期", trigger: "blur" }],
         state: [{ required: true, trigger: "change" }],
-        money: [{ validator: validate, trigger: "blur" }]
+        remark: [{ required: true, message: "请输入备注", trigger: "blur" }]
       }
     };
   },
   methods: {
     init(type, item) {
-      let obj = JSON.parse(JSON.stringify(item));
-      this.type === type;
+      this.type = type;
       if (type === "edit") {
-        this.form = item;
+        let obj = JSON.parse(JSON.stringify(item));
+        this.form = obj;
+        if(this.form.state=='重要'){
+            this.form.state ='1';
+        }
+        else if(this.form.state=='一般'){
+            this.form.state ='2';
+        }
+        else if(this.form.state=='次要'){
+            this.form.state ='3';
+        }
       }
       this.dialogVisible = true;
     },
@@ -91,8 +87,7 @@ export default {
         title: "",
         state: "1",
         date: "",
-        remark: "",
-        money: ""
+        remark: ""
       };
     },
     submit() {
@@ -108,7 +103,7 @@ export default {
       });
     },
     onUpadte(){
-    http({ url: "expenses/edit", data: this.form, method: "post" })
+    http({ url: "remeber/update", data: this.form, method: "post" })
             .then(res => {
               this.$notify({
                 title: "成功",
@@ -124,7 +119,7 @@ export default {
             });
     },
     onAdd(){
-        http({ url: "expenses/add", data: this.form, method: "post" })
+        http({ url: "remeber/add", data: this.form, method: "post" })
             .then(res => {
               this.$notify({
                 title: "成功",

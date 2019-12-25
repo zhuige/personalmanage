@@ -3,24 +3,24 @@
     <el-button v-waves type="primary" size="medium" icon="el-icon-plus" @click="onAdd">添加</el-button>
     <div class="table-wrapper">
     <el-table :data="list" v-loading="loading">
-      <el-table-column label="标题"> 
+      <el-table-column label="称呼"> 
         <template slot-scope="scope">
-          {{scope.row.title}}
+          {{scope.row.name}}
         </template>
       </el-table-column>
-      <el-table-column label="时间"> 
+      <el-table-column label="姓名"> 
         <template slot-scope="scope">
-          {{scope.row.date}}
+          {{scope.row.realname}}
         </template>
       </el-table-column>
-      <el-table-column label="类型"> 
+       <el-table-column label="电话"> 
         <template slot-scope="scope">
-          {{scope.row.state}}
+          {{scope.row.phone}}
         </template>
       </el-table-column>
-      <el-table-column label="金额"> 
+      <el-table-column label="关系"> 
         <template slot-scope="scope">
-          ¥ {{scope.row.money}}
+          {{scope.row.relation}}
         </template>
       </el-table-column>
       <!-- show-overflow-tooltip  -->
@@ -29,10 +29,10 @@
           {{scope.row.remark}}
         </template>
       </el-table-column>
-      <el-table-column label="操作"> 
+      <el-table-column label="操作" width="180px"> 
         <template slot-scope="scope">
            <el-button size="mini" type="info" @click="onEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger">删除</el-button>
+          <el-button size="mini" type="danger" @click="onDelete(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -62,7 +62,7 @@ export default {
     getList() {
       this.loading = true;
       http({
-        url: "remeber/list"
+        url: "relation/list"
       }).then(res => {
         this.list = res.data.data;
       }).finally(()=>{
@@ -74,6 +74,31 @@ export default {
     },
     onEdit(item) {
        this.$refs.addDialog.init('edit',item);
+    },
+    onDelete(id) {
+      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        http({
+          url: "relation/delete",
+          method: "delete",
+          data:{
+            id
+          }
+        }).then(res => {
+            this.getList();
+          this.$notify({
+            title: "成功",
+            message: "删除成功",
+            type: "success",
+            duration: 1500
+          });
+        });
+      }).catch(()=>{
+       
+      })
     }
   }
 };
