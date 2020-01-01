@@ -1,6 +1,20 @@
 <template>
   <div class="container">
+      <div style="display:flex">
     <el-button v-waves type="primary" size="medium" icon="el-icon-plus" @click="onAdd">添加</el-button>
+     <div style="margin-left:10px;width:270px">
+        <el-input placeholder="请输入昵称或姓名" v-model="keyWord" @keydown.native.enter="getList"/>
+      </div>
+      <el-button
+      @click="getList"
+        v-waves
+        type="primary"
+        size="medium"
+        icon="el-icon-search"
+        style="margin-left:10px"
+        
+        >搜索</el-button>
+  </div>
     <div class="table-wrapper">
     <el-table :data="list" v-loading="loading">
       <el-table-column label="称呼"> 
@@ -49,7 +63,8 @@ export default {
   data() {
     return {
       list: [],
-      loading:false
+      loading:false,
+      keyWord:''
     };
   },
   components:{
@@ -62,7 +77,10 @@ export default {
     getList() {
       this.loading = true;
       http({
-        url: "relation/list"
+        url: "relation/list",
+        params:{
+            keyWord:this.keyWord
+        }
       }).then(res => {
         this.list = res.data.data;
       }).finally(()=>{
