@@ -14,7 +14,22 @@
         style="margin-left:10px"
         
         >搜索</el-button>
-        </div>
+         <el-select v-model="state" placeholder="请选择支付类型" style=" margin-left:10px" @change="getList" clearable>
+        <el-option
+          label='重要'
+          value="1"
+        />
+        <el-option
+          label='一般'
+          value="2"
+        />
+        <el-option
+          label='次要'
+          value="3"
+        />
+      </el-select>
+    </div>
+
     <div class="table-wrapper">
     <el-table :data="list" v-loading="loading">
       <el-table-column label="标题">
@@ -67,7 +82,8 @@ export default {
     return {
       list: [],
       loading:false,
-      keyWord:''
+      keyWord:'',
+      state:''
     };
   },
   components:{
@@ -82,7 +98,8 @@ export default {
       http({
         url: "remeber/list",
         params:{
-            keyWord:this.keyWord
+            keyWord:this.keyWord,
+            state:this.state
         }
       }).then(res => {
         this.list = res.data.data;

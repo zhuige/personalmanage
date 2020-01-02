@@ -11,17 +11,31 @@
       >
 
       <div style="margin-left:10px;width:270px">
-        <el-input placeholder="请输入标题" v-model="keyWord" @keydown.native.enter="getList"/>
+        <el-input
+          placeholder="请输入标题"
+          v-model="keyWord"
+          @keydown.native.enter="getList"
+        />
       </div>
       <el-button
-      @click="getList"
+        @click="getList"
         v-waves
         type="primary"
         size="medium"
         icon="el-icon-search"
         style="margin-left:10px"
-        
-        >搜索</el-button>
+        >搜索</el-button
+      >
+      <el-select v-model="state" placeholder="请选择支付类型" style=" margin-left:10px" @change="getList" clearable>
+        <el-option
+          label='收入'
+          value="1"
+        />
+        <el-option
+          label='支出'
+          value="2"
+        />
+      </el-select>
     </div>
 
     <div class="table-wrapper">
@@ -86,7 +100,8 @@ export default {
     return {
       list: [],
       loading: false,
-      keyWord: ""
+      keyWord: "",
+      state:''
     };
   },
   components: {
@@ -100,8 +115,9 @@ export default {
       this.loading = true;
       http({
         url: "expenses/list",
-        params:{
-            keyWord:this.keyWord    
+        params: {
+          keyWord: this.keyWord,
+          state:this.state
         }
       })
         .then(res => {

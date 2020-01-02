@@ -3,7 +3,7 @@
       <div style="display:flex">
     <el-button v-waves type="primary" size="medium" icon="el-icon-plus" @click="onAdd">添加</el-button>
      <div style="margin-left:10px;width:270px">
-        <el-input placeholder="请输入昵称或姓名" v-model="keyWord" @keydown.native.enter="getList"/>
+        <el-input placeholder="请输入称呼或姓名" v-model="keyWord" @keydown.native.enter="getList"/>
       </div>
       <el-button
       @click="getList"

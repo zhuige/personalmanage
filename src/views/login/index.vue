@@ -43,19 +43,39 @@
           @keyup.enter.native="login"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          <svg-icon
+            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
+          />
         </span>
       </el-form-item>
-
+      <div class="rew" @click="onShowDialog">忘记密码</div>
       <div class="login-wrapper">
-        <el-button v-waves :loading="loading" type="primary" @click.native.prevent="login">登陆</el-button>
-        <el-button v-waves :loading="loading" type="primary" @click.native.prevent="register">注册</el-button>
+        <el-button
+          v-waves
+          :loading="loading"
+          type="primary"
+          @click.native.prevent="login"
+          >登陆</el-button
+        >
+        <el-button
+          v-waves
+          :loading="loading"
+          type="primary"
+          @click.native.prevent="register"
+          >注册</el-button
+        >
       </div>
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span>password: any</span>
       </div>-->
     </el-form>
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="500px">
+      <div class="wxImgWrapper">
+          <img src="./pwd.jpg" class="wxImg" />
+          <div class="wxText">请联系管理员</div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -81,6 +101,7 @@ export default {
     //   }
     // };
     return {
+      dialogVisible: false,
       loginForm: {
         username: "",
         password: ""
@@ -113,6 +134,9 @@ export default {
     // }
   },
   methods: {
+    onShowDialog() {
+      this.dialogVisible = true;
+    },
     showPwd() {
       if (this.passwordType === "password") {
         this.passwordType = "";
@@ -187,7 +211,31 @@ export default {
 </script>
 
 <style lang="scss">
+.el-dialog__body{
+    padding-top: 0;
+}
+.wxImgWrapper{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.wxText{
+    font-size: 18px;
+}
+.wxImg {
+  width: 240px;
+}
+.rew {
+  width: 100%;
+  color: white;
+  cursor: pointer;
+  text-align: right;
+  &:hover {
+    color: blue;
+  }
+}
 .login-wrapper {
+  margin-top: 20px;
   width: 100%;
   display: flex;
   justify-content: center;

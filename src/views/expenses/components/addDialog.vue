@@ -75,7 +75,7 @@ export default {
         title: [{ required: true, message: "请输入标题", trigger: "blur" }],
         date: [{ required: true, message: "请输入日期", trigger: "blur" }],
         state: [{ required: true, trigger: "change" }],
-        money: [{ validator: validate, trigger: "blur" }]
+        money: [{ required:true,validator: validate, trigger: "blur" }]
       }
     };
   },
