@@ -48,9 +48,29 @@
           />
         </span>
       </el-form-item>
-      <div class="rew" @click="onShowDialog">忘记密码</div>
+      <el-form-item prop="email" v-if="!isLogin">
+        <span class="svg-container">
+          <svg-icon icon-class="tree" />
+        </span>
+        <el-input
+          ref="username"
+          v-model="loginForm.email"
+          placeholder="QQ邮箱"
+          name="email"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
+      </el-form-item>
+
+      <div class="rew-wrapper">
+        <div class="rew" @click="onShowDialog">忘记密码</div>
+        <div class="type" @click="isLogin = true">登录</div>
+        <div class="type" @click="isLogin = false">注册</div>
+      </div>
       <div class="login-wrapper">
         <el-button
+          v-if="isLogin"
           v-waves
           :loading="loading"
           type="primary"
@@ -58,6 +78,7 @@
           >登陆</el-button
         >
         <el-button
+        v-if="!isLogin"
           v-waves
           :loading="loading"
           type="primary"
@@ -70,21 +91,20 @@
         <span>password: any</span>
       </div>-->
     </el-form>
-    <el-dialog title="提示" :visible.sync="dialogVisible" width="500px">
-      <div class="wxImgWrapper">
-          <img src="./pwd.jpg" class="wxImg" />
-          <div class="wxText">请联系管理员</div>
-      </div>
-    </el-dialog>
+    <dialog-form ref="dialog"></dialog-form>
   </div>
 </template>
 
 <script>
+import dialogForm from "./dialog";
 import { validUsername } from "@/utils/validate";
 import http from "@/utils/request";
 
 export default {
   name: "Login",
+  components: {
+    dialogForm
+  },
   data() {
     // const validateUsername = (rule, value, callback) => {
     //   if (!validUsername(value)) {
@@ -100,11 +120,23 @@ export default {
     //     callback();
     //   }
     // };
+    const checkEmail = (rule, value, callback) => {
+      if(this.isLogin){
+        callback();
+      }
+      const reg = /^\d{5,12}@[qQ][qQ]\.(com|cn)$/;
+      if (reg.test(value)) {
+        callback();
+      } else {
+        callback(new Error("请输入正确的qq邮箱"));
+      }
+    };
     return {
-      dialogVisible: false,
+      isLogin:true,
       loginForm: {
         username: "",
-        password: ""
+        password: "",
+        email: ""
       },
       loginRules: {
         username: [
@@ -112,7 +144,8 @@ export default {
         ],
         password: [
           { required: true, message: "请输入用户密码", trigger: "blur" }
-        ]
+        ],
+        email: [{ required: true, validator: checkEmail, trigger: "blur" }]
       },
       loading: false,
       passwordType: "password",
@@ -135,7 +168,7 @@ export default {
   },
   methods: {
     onShowDialog() {
-      this.dialogVisible = true;
+      this.$refs.dialog.init();
     },
     showPwd() {
       if (this.passwordType === "password") {
@@ -193,6 +226,7 @@ export default {
                 message: "注册成功，请登录",
                 duration: 1500
               });
+              this.isLogin = true;
             } else {
               this.$notify({
                 title: "失败",
@@ -211,27 +245,37 @@ export default {
 </script>
 
 <style lang="scss">
-.el-dialog__body{
-    padding-top: 0;
+.el-dialog__body {
+  padding-top: 0;
 }
-.wxImgWrapper{
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+.wxImgWrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
-.wxText{
-    font-size: 18px;
+.wxText {
+  font-size: 18px;
 }
 .wxImg {
   width: 240px;
 }
-.rew {
-  width: 100%;
+.rew-wrapper{
+ display: flex;
+}
+.type{
+  width: 50px;
   color: white;
   cursor: pointer;
-  text-align: right;
   &:hover {
-    color: blue;
+    color: #409EFF;
+  }
+}
+.rew {
+  width: 80px;
+  color: white;
+  cursor: pointer;
+  &:hover {
+    color: #409EFF;
   }
 }
 .login-wrapper {
