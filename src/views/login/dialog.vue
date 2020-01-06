@@ -18,7 +18,7 @@
           <el-input v-model="dialogFrom.username"></el-input>
         </el-form-item>
       </el-form>
-      <div class="wxText">我们会发送到所绑定的QQ邮箱，请发送后到邮箱查看</div>
+      <div class="wxText">我们会发送到账号所绑定的QQ邮箱，请发送后到邮箱查看</div>
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
@@ -75,4 +75,6 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

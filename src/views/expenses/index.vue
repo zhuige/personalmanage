@@ -26,15 +26,15 @@
         style="margin-left:10px"
         >搜索</el-button
       >
-      <el-select v-model="state" placeholder="请选择支付类型" style=" margin-left:10px" @change="getList" clearable>
-        <el-option
-          label='收入'
-          value="1"
-        />
-        <el-option
-          label='支出'
-          value="2"
-        />
+      <el-select
+        v-model="state"
+        placeholder="请选择支付类型"
+        style=" margin-left:10px"
+        @change="getList"
+        clearable
+      >
+        <el-option label="收入" value="1" />
+        <el-option label="支出" value="2" />
       </el-select>
     </div>
 
@@ -86,6 +86,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <div style="text-align:right;margin-top:10px;padding-right:30px;color:red">总支出：{{ paytotal }}</div>
+      <div style="text-align:right; margin-top:10px;padding-right:30px;color:green">总收入：{{ gettotal }}</div>
+
     </div>
     <add-dialog ref="addDialog" />
   </div>
@@ -101,7 +104,9 @@ export default {
       list: [],
       loading: false,
       keyWord: "",
-      state:''
+      state: "",
+      gettotal: "",
+      paytotal: ""
     };
   },
   components: {
@@ -117,11 +122,13 @@ export default {
         url: "expenses/list",
         params: {
           keyWord: this.keyWord,
-          state:this.state
+          state: this.state
         }
       })
         .then(res => {
-          this.list = res.data.data;
+          this.list = res.data.data.data;
+          this.gettotal = res.data.data.gettotal;
+          this.paytotal = res.data.data.paytotal;
           this.list.map(item => {
             item.state = item.state === "1" ? "收入" : "支出";
           });

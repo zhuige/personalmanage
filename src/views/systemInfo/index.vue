@@ -1,7 +1,7 @@
 <template>
   <div class="container" v-loading="loading">
     <div style="width:400px">
-      <el-form ref="form" :model="editFrom" label-width="120px">
+      <el-form ref="formData" :model="editFrom" :rules="rule" label-width="120px">
         <el-form-item label="账号：">
           {{ form.username }}
         </el-form-item>
@@ -11,7 +11,7 @@
           ></template>
           <template v-else>{{ form.realname }}</template>
         </el-form-item>
-        <el-form-item label="邮箱：">
+        <el-form-item label="qq邮箱：" prop="email">
           <template v-if="isEdit">
             <el-input v-model="editFrom.email"></el-input
           ></template>
@@ -29,8 +29,12 @@
           >
         </el-form-item>
         <el-form-item>
-          <el-button v-waves type="info" @click="onEdit">{{!isEdit?'编辑':'取消'}}</el-button>
-          <el-button v-waves type="primary" @click="onSave" v-if="isEdit">保存</el-button>
+          <el-button v-waves type="info" @click="onEdit">{{
+            !isEdit ? "编辑" : "取消"
+          }}</el-button>
+          <el-button v-waves type="primary" @click="onSave" v-if="isEdit"
+            >保存</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
@@ -43,11 +47,25 @@ import resetPassword from "./components/resetPassword";
 import http from "@/utils/request";
 export default {
   data() {
+    const checkEmail = (rule, value, callback) => {
+      if (this.isLogin) {
+        callback();
+      }
+      const reg = /^\d{5,12}@[qQ][qQ]\.(com|cn)$/;
+      if (reg.test(value)) {
+        callback();
+      } else {
+        callback(new Error("请输入正确的qq邮箱"));
+      }
+    };
     return {
+      rule: {
+        email: [{ required: true, validator: checkEmail, trigger: "blur" }]
+      },
       form: {},
       editFrom: {},
       isEdit: false,
-      loading:false
+      loading: false
     };
   },
   components: {
@@ -63,11 +81,15 @@ export default {
   },
   methods: {
     onSave() {
-      this.isEdit  = false;
-      this.updateUserInfo();
+      this.$refs.formData.validate(res => {
+        if (res) {
+          this.updateUserInfo();
+          this.isEdit = false;
+        }
+      });
     },
     onEdit() {
-        this.isEdit = !this.isEdit ;
+      this.isEdit = !this.isEdit;
       this.editFrom = JSON.parse(JSON.stringify(this.form));
     },
     resetPassword() {
@@ -88,18 +110,20 @@ export default {
         url: "users/updateUserInfo",
         method: "post",
         data: this.editFrom
-      }).then(res => {
-        this.$notify({
-          title:'成功',
-          message:'编辑成功',
-          duration:1500,
-          type:'success'
-        })
-        this.getUserInfo();
-        this.$eventBus.$emit("getUserInfo");
-      }).finally(()=>{
-        this.loading = false;
       })
+        .then(res => {
+          this.$notify({
+            title: "成功",
+            message: "编辑成功",
+            duration: 1500,
+            type: "success"
+          });
+          this.getUserInfo();
+          this.$eventBus.$emit("getUserInfo");
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     }
   }
 };

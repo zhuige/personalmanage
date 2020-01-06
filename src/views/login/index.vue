@@ -9,7 +9,7 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">个人信息事务管理系统</h3>
+        <h3 class="title">个人事务管理系统</h3>
       </div>
 
       <el-form-item prop="username">
@@ -313,7 +313,8 @@ $cursor: #fff;
       -webkit-appearance: none;
       border-radius: 0px;
       padding: 12px 5px 12px 15px;
-      color: $light_gray;
+    //   color: $light_gray;
+      color: plum;
       height: 47px;
       caret-color: $cursor;
 
